@@ -18,7 +18,6 @@ import mekanism.api.recipes.cache.CachedRecipe;
 import mekanism.api.recipes.cache.CachedRecipe.OperationTracker.RecipeError;
 import mekanism.api.recipes.inputs.IInputHandler;
 import mekanism.api.recipes.inputs.InputHelper;
-import mekanism.common.Mekanism;
 import mekanism.common.capabilities.holder.slot.InventorySlotHelper;
 import mekanism.common.integration.computer.SpecialComputerMethodWrapper.ComputerIInventorySlotWrapper;
 import mekanism.common.integration.computer.annotation.WrappingComputerMethod;
@@ -155,13 +154,26 @@ public class TileEntityAlloyingFactory extends TileEntityItemToItemFactory<Alloy
     @Override
     public void parseUpgradeData(@NotNull IUpgradeData upgradeData) {
         if (upgradeData instanceof AlloyerUpgradeData data) {
-            //Generic factory upgrade data handling
-            super.parseUpgradeData(upgradeData);
-            //Copy the stack using NBT so that if it is not actually valid due to a reload we don't crash
-            extraSlot.deserializeNBT(data.extraSlot.serializeNBT());
-            secondExtraSlot.deserializeNBT(data.secondaryExtraSlot.serializeNBT());
-        } else {
-            Mekanism.logger.warn("Unhandled upgrade data.", new Throwable());
+            // Generic factory upgrade data handling
+            try {
+                super.parseUpgradeData(upgradeData);
+            } catch (Throwable t) {
+                // If Mekanism's parse fails (e.g. some slots are null for this variant), continue
+                // with a best-effort copy of the extra slots to avoid crashing on upgrade.
+            }
+            // Copy the stack using NBT so that if it is not actually valid due to a reload we don't crash
+            try {
+                if (data.extraSlot != null) {
+                    extraSlot.deserializeNBT(data.extraSlot.serializeNBT());
+                }
+            } catch (Throwable ignored) {
+            }
+            try {
+                if (data.secondaryExtraSlot != null) {
+                    secondExtraSlot.deserializeNBT(data.secondaryExtraSlot.serializeNBT());
+                }
+            } catch (Throwable ignored) {
+            }
         }
     }
 

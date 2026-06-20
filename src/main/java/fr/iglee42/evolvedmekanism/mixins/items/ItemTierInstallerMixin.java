@@ -3,7 +3,9 @@ package fr.iglee42.evolvedmekanism.mixins.items;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -96,11 +98,60 @@ public class ItemTierInstallerMixin {
                                 if (tileEntity instanceof ITileDirectional directional && directional.isDirectional()) {
                                     upgradedTile.setFacing(directional.getDirection());
                                 }
-                                upgradedTile.parseUpgradeData(upgradeData);
+                                try {
+                                    upgradedTile.parseUpgradeData(upgradeData);
+                                } catch (Throwable parseEx) {
+                                    // Fallback: best-effort transfer of slot NBT data if parseUpgradeData fails
+                                    try {
+                                        if (upgradeData instanceof fr.iglee42.evolvedmekanism.tiles.upgrade.AlloyerUpgradeData allData) {
+                                            // Try to copy extra/secondary extra slots via reflection if present on the new tile
+                                            try {
+                                                java.lang.reflect.Field extraField = upgradedTile.getClass().getDeclaredField("extraSlot");
+                                                extraField.setAccessible(true);
+                                                Object targetExtra = extraField.get(upgradedTile);
+                                                if (targetExtra != null && allData.extraSlot != null) {
+                                                    java.lang.reflect.Method deserialize = targetExtra.getClass().getMethod("deserializeNBT", net.minecraft.nbt.Tag.class);
+                                                    deserialize.invoke(targetExtra, allData.extraSlot.serializeNBT());
+                                                }
+                                            } catch (NoSuchFieldException ignored) {
+                                            }
+                                            try {
+                                                java.lang.reflect.Field secondField = upgradedTile.getClass().getDeclaredField("secondExtraSlot");
+                                                secondField.setAccessible(true);
+                                                Object targetSecond = secondField.get(upgradedTile);
+                                                if (targetSecond != null && allData.secondaryExtraSlot != null) {
+                                                    java.lang.reflect.Method deserialize2 = targetSecond.getClass().getMethod("deserializeNBT", net.minecraft.nbt.Tag.class);
+                                                    deserialize2.invoke(targetSecond, allData.secondaryExtraSlot.serializeNBT());
+                                                }
+                                            } catch (NoSuchFieldException ignored) {
+                                            }
+                                        }
+                                    } catch (Throwable ignored) {
+                                    }
+                                }
                                 upgradedTile.sendUpdatePacket();
                                 upgradedTile.setChanged();
                                 if (context.getPlayer() != null && !context.getPlayer().isCreative()) {
-                                    context.getItemInHand().shrink(1);
+                                    // Use player's hand stack directly and set it back to ensure server-side update
+                                    InteractionHand hand = context.getHand();
+                                    if (context.getPlayer() != null) {
+                                        var player = context.getPlayer();
+                                        var handStack = player.getItemInHand(hand);
+                                        handStack.shrink(1);
+                                        // If the stack is empty after shrinking, set to EMPTY to avoid ghost items
+                                        if (handStack.isEmpty()) {
+                                            player.setItemInHand(hand, net.minecraft.world.item.ItemStack.EMPTY);
+                                        } else {
+                                            player.setItemInHand(hand, handStack);
+                                        }
+                                        // Ensure server-side container sync for server players
+                                        if (player instanceof ServerPlayer serverPlayer) {
+                                            try {
+                                                serverPlayer.containerMenu.broadcastChanges();
+                                            } catch (Throwable ignored) {
+                                            }
+                                        }
+                                    }
                                 }
                                 cir.setReturnValue(InteractionResult.sidedSuccess(level.isClientSide()));
                             }
