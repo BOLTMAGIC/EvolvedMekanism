@@ -57,7 +57,16 @@ public class AlloyTierMixin implements InitializableEnum {
         // alloy variants here. They will be initialized later via the InitializableEnum
         // invocation in EvolvedMekanism.initEnums(), which ensures BaseTier values
         // are present before creating AlloyTier variants.
-        if (EMAlloyTier.HYPERCHARGED != null || EMBaseTier.OVERCLOCKED == null) return;
+        if (EMAlloyTier.HYPERCHARGED != null) return;
+        if (EMBaseTier.OVERCLOCKED == null) {
+            // Try to initialize BaseTier if it hasn't been done yet
+            try {
+                ((InitializableEnum)(Object)BaseTier.BASIC).evolvedmekanism$initNewValues();
+            } catch (Exception e) {
+                // If BaseTier can't be initialized yet, defer and return
+                return;
+            }
+        }
         EMAlloyTier.HYPERCHARGED = evolvedmekanism$addVariant("HYPERCHARGED", EMBaseTier.OVERCLOCKED);
         EMAlloyTier.SUBATOMIC = evolvedmekanism$addVariant("SUBATOMIC", EMBaseTier.QUANTUM);
         EMAlloyTier.SINGULAR = evolvedmekanism$addVariant("SINGULAR", EMBaseTier.DENSE);
