@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 
 @SuppressWarnings("unused")
 @Mixin(value = AlloyTier.class,remap = false)
@@ -34,7 +35,7 @@ public class AlloyTierMixin implements InitializableEnum {
         int ordinal = variants.isEmpty() ? 0 : variants.get(variants.size() - 1).ordinal() + 1;
         AlloyTier casing = evolvedmekanism$initInvoker(internalName,
                 ordinal,
-                internalName.toLowerCase(),
+                internalName.toLowerCase(Locale.ROOT),
                 baseTier);
         variants.add(casing);
         AlloyTierMixin.$VALUES = variants.toArray(new AlloyTier[0]);

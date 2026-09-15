@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 
 @Mixin(value = BaseTier.class,remap = false)
 public class BaseTierMixin implements InitializableEnum {
@@ -33,7 +34,7 @@ public class BaseTierMixin implements InitializableEnum {
         int ordinal = variants.isEmpty() ? 0 : variants.get(variants.size() - 1).ordinal() + 1;
         BaseTier casing = evolvedmekanism$initInvoker(internalName,
                 ordinal,
-                ModsUtils.getUpperName(internalName.toLowerCase(),"_"),
+                ModsUtils.getUpperName(internalName.toLowerCase(Locale.ROOT),"_"),
                 rgb,
                 mapColor);
         variants.add(casing);
