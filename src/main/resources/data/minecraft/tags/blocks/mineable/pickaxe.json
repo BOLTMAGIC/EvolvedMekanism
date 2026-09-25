@@ -22,7 +22,11 @@
         "evolvedmekanism:block_alloy_subatomic",
         "evolvedmekanism:block_alloy_singular",
         "evolvedmekanism:block_alloy_exoversal",
-        "evolvedmekanism:block_alloy_creative"
+        "evolvedmekanism:block_alloy_creative",
+        { "id": "mekanism_extras:absolute_alloying_factory", "required": false },
+        { "id": "mekanism_extras:supreme_alloying_factory", "required": false },
+        { "id": "mekanism_extras:cosmic_alloying_factory", "required": false },
+        { "id": "mekanism_extras:infinite_alloying_factory", "required": false }
 
     ]
 }

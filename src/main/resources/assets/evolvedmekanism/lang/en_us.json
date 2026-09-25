@@ -64,5 +64,13 @@
     "description.evolvedmekanism.supercharging_element": "A modular, somewhat dangerous charger that is capable of charging the APT massively. Grants +25% processing speed per placed MK1 element. Each element stacks additively — you can place single elements to increase speed; you don't need to place all 25 at once.",
     "description.evolvedmekanism.supercharging_element_mk2": "An upgraded, even more dangerous charger for the APT. Grants +250% processing speed per placed MK2 element. Each element stacks additively — single MK2 blocks already provide a large boost; you don't have to place them all at once.",
     "apt.evolvedmekanism.invalid_supercharging": "Couldn't form, invalid Supercharging Element arrangement.",
-    "gui.evolvedmekanism.speed": "Speed: "
+    "gui.evolvedmekanism.speed": "Speed: ",
+    "block.mekanism_extras.absolute_alloying_factory": "Absolute Alloying Factory",
+    "container.mekanism_extras.absolute_alloying_factory": "Absolute Alloying Factory",
+    "block.mekanism_extras.supreme_alloying_factory": "Supreme Alloying Factory",
+    "container.mekanism_extras.supreme_alloying_factory": "Supreme Alloying Factory",
+    "block.mekanism_extras.cosmic_alloying_factory": "Cosmic Alloying Factory",
+    "container.mekanism_extras.cosmic_alloying_factory": "Cosmic Alloying Factory",
+    "block.mekanism_extras.infinite_alloying_factory": "Infinite Alloying Factory",
+    "container.mekanism_extras.infinite_alloying_factory": "Infinite Alloying Factory"
 }
