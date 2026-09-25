@@ -75,6 +75,7 @@ mixin {
     add sourceSets.main, "${mod_id}.refmap.json"
 
     config "${mod_id}.mixins.json"
+    config "${mod_id}.extras.mixins.json"
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
@@ -100,6 +101,9 @@ dependencies {
 
 
     implementation fg.deobf("mekanism:Mekanism:${mekanism_version}")
+
+    //Optional: Absolute+ alloying factories are only registered when Mekanism Extras is present
+    compileOnly fg.deobf("curse.maven:mekanism-extras-1026040:8247562")
 
     runtimeOnly fg.deobf("curse.maven:ctm-267602:5983309")
     runtimeOnly fg.deobf("curse.maven:SolarFluxReborn-246974:6382702")

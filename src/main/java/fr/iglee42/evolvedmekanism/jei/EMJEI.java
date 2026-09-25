@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import fr.iglee42.evolvedmekanism.EvolvedMekanism;
+import fr.iglee42.evolvedmekanism.compat.extras.ExtrasJEI;
+import net.minecraftforge.fml.ModList;
 import fr.iglee42.evolvedmekanism.jei.categories.APTRecipeCategory;
 import fr.iglee42.evolvedmekanism.jei.categories.AlloyerRecipeCategory;
 import fr.iglee42.evolvedmekanism.jei.categories.ChemixerRecipeCategory;
@@ -149,6 +151,9 @@ public class EMJEI implements IModPlugin {
     @Override
     public void registerRecipeCatalysts(@NotNull IRecipeCatalystRegistration registry) {
         CatalystRegistryHelper.register(registry, EMBlocks.ALLOYER);
+        if (ModList.get().isLoaded("mekanism_extras")) {
+            ExtrasJEI.registerCatalysts(registry);
+        }
         CatalystRegistryHelper.register(registry, EMBlocks.CHEMIXER);
         CatalystRegistryHelper.register(registry,APT, EMBlocks.APT_CASING,EMBlocks.APT_PORT,EMBlocks.SUPERCHARGING_ELEMENT, EMBlocks.SUPERCHARGING_ELEMENT_MK2);
     }
