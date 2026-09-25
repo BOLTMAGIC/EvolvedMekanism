@@ -6,6 +6,7 @@ import java.util.Set;
 import fr.iglee42.evolvedmekanism.interfaces.EMInputRecipeCache;
 import fr.iglee42.evolvedmekanism.interfaces.ThreeInputCachedRecipe;
 import fr.iglee42.evolvedmekanism.interfaces.TripleItemRecipeLookupHandler;
+import fr.iglee42.evolvedmekanism.mixins.accessors.TileEntityFactoryAccessor;
 import fr.iglee42.evolvedmekanism.recipes.AlloyerRecipe;
 import fr.iglee42.evolvedmekanism.registries.EMRecipeType;
 import fr.iglee42.evolvedmekanism.tiles.LimitedInputInventorySlot;
@@ -18,6 +19,7 @@ import mekanism.api.recipes.cache.CachedRecipe;
 import mekanism.api.recipes.cache.CachedRecipe.OperationTracker.RecipeError;
 import mekanism.api.recipes.inputs.IInputHandler;
 import mekanism.api.recipes.inputs.InputHelper;
+import mekanism.common.Mekanism;
 import mekanism.common.capabilities.holder.slot.InventorySlotHelper;
 import mekanism.common.integration.computer.SpecialComputerMethodWrapper.ComputerIInventorySlotWrapper;
 import mekanism.common.integration.computer.annotation.WrappingComputerMethod;
@@ -55,7 +57,6 @@ public class TileEntityAlloyingFactory extends TileEntityItemToItemFactory<Alloy
 
     private final IInputHandler<@NotNull ItemStack> extraInputHandler;
     private final IInputHandler<@NotNull ItemStack> secondExtraInputHandler;
-    EnergyInventorySlot energySlot;
 
     @WrappingComputerMethod(wrapper = ComputerIInventorySlotWrapper.class, methodNames = "getSecondaryInput", docPlaceholder = "secondary input slot")
     LimitedInputInventorySlot extraSlot;
@@ -154,32 +155,20 @@ public class TileEntityAlloyingFactory extends TileEntityItemToItemFactory<Alloy
     @Override
     public void parseUpgradeData(@NotNull IUpgradeData upgradeData) {
         if (upgradeData instanceof AlloyerUpgradeData data) {
-            // Generic factory upgrade data handling
-            try {
-                super.parseUpgradeData(upgradeData);
-            } catch (Throwable t) {
-                // If Mekanism's parse fails (e.g. some slots are null for this variant), continue
-                // with a best-effort copy of the extra slots to avoid crashing on upgrade.
-            }
-            // Copy the stack using NBT so that if it is not actually valid due to a reload we don't crash
-            try {
-                if (data.extraSlot != null) {
-                    extraSlot.deserializeNBT(data.extraSlot.serializeNBT());
-                }
-            } catch (Throwable ignored) {
-            }
-            try {
-                if (data.secondaryExtraSlot != null) {
-                    secondExtraSlot.deserializeNBT(data.secondaryExtraSlot.serializeNBT());
-                }
-            } catch (Throwable ignored) {
-            }
+            //Generic factory upgrade data handling (energy, progress, slots, then components such as upgrades)
+            super.parseUpgradeData(upgradeData);
+            //Copy the stack using NBT so that if it is not actually valid due to a reload we don't crash
+            extraSlot.deserializeNBT(data.extraSlot.serializeNBT());
+            secondExtraSlot.deserializeNBT(data.secondaryExtraSlot.serializeNBT());
+        } else {
+            Mekanism.logger.warn("Unhandled upgrade data.", new Throwable());
         }
     }
 
     @NotNull
     @Override
     public AlloyerUpgradeData getUpgradeData() {
+        EnergyInventorySlot energySlot = ((TileEntityFactoryAccessor) this).evolvedmekanism$getEnergySlot();
         return new AlloyerUpgradeData(redstone, getControlType(), getEnergyContainer(), progress, energySlot, extraSlot,secondExtraSlot, inputSlots, outputSlots, isSorting(), getComponents());
     }
 }

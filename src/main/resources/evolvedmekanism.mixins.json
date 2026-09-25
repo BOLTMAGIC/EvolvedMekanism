@@ -15,7 +15,8 @@
     "tiers.BaseTierMixin",
     "tiles.TileEntityMekanismMixin",
     "tiles.TileEntityItemToItemFactoryMixin",
-    "items.ItemTierInstallerMixin"
+    "items.ItemTierInstallerMixin",
+    "accessors.TileEntityFactoryAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
