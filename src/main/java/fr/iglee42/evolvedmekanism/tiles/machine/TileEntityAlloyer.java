@@ -8,6 +8,7 @@ import fr.iglee42.evolvedmekanism.registries.EMBlocks;
 import fr.iglee42.evolvedmekanism.registries.EMRecipeType;
 import fr.iglee42.evolvedmekanism.tiles.LimitedInputInventorySlot;
 import fr.iglee42.evolvedmekanism.tiles.upgrade.AlloyerUpgradeData;
+import fr.iglee42.evolvedmekanism.utils.EMUpgrades;
 import mekanism.api.IContentsListener;
 import mekanism.api.inventory.IInventorySlot;
 import mekanism.api.math.FloatingLong;
@@ -143,6 +144,12 @@ public class TileEntityAlloyer extends TileEntityProgressMachine<AlloyerRecipe> 
     @Override
     public IMekanismRecipeTypeProvider<AlloyerRecipe, EMInputRecipeCache.TripleItem<AlloyerRecipe>> getRecipeType() {
         return EMRecipeType.ALLOYING;
+    }
+
+    @Override
+    public int getTicksRequired() {
+        //Mekanism Extras' creative upgrade finishes an operation every tick (its energy side is handled by Extras)
+        return EMUpgrades.hasCreative(this) ? 1 : super.getTicksRequired();
     }
 
     @Nullable
