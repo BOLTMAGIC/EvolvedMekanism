@@ -7,7 +7,6 @@ import mekanism.api.AutomationType;
 import mekanism.api.NBTConstants;
 import mekanism.api.chemical.attribute.ChemicalAttributeValidator;
 import mekanism.api.chemical.gas.Gas;
-import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.gas.IGasTank;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.recipes.ItemStackGasToItemStackRecipe;
@@ -62,7 +61,7 @@ public class APTMultiblockData extends MultiblockData implements IValveHandler{
         super(tile);
         gasTanks.add(inputTank = MultiblockChemicalTankBuilder.GAS.input(this, EMConfig.general.aptInputStorage::getOrDefault, this::hasRecipeWith,
               ChemicalAttributeValidator.ALWAYS_ALLOW, createSaveAndComparator()));
-        inventorySlots.add(inputSlot = InputInventorySlot.at(item->hasRecipeForInputs(item,inputTank.getStack()),this::hasRecipeWith,createSaveAndComparator(), 28, 40));
+        inventorySlots.add(inputSlot = InputInventorySlot.at(this::hasRecipeWith, this::hasRecipeWith, createSaveAndComparator(), 28, 40));
         inventorySlots.add(outputSlot = OutputInventorySlot.at(createSaveAndComparator(), 132, 40));
         energyContainers.add(energyContainer =  BasicEnergyContainer.create(EMConfig.general.aptEnergyStorage.getOrDefault(), automationType -> isFormed(), type->isFormed(), createSaveAndComparator()));
     }
@@ -75,10 +74,6 @@ public class APTMultiblockData extends MultiblockData implements IValveHandler{
         return getWorld().getRecipeManager().getAllRecipesFor(EMRecipeType.APT.getRecipeType()).stream().anyMatch(r-> r.getChemicalInput().testType(gas));
     }
 
-
-    private boolean hasRecipeForInputs(ItemStack stack,GasStack gas){
-        return hasRecipeWith(stack) && getWorld().getRecipeManager().getAllRecipesFor(EMRecipeType.APT.getRecipeType()).stream().anyMatch(r-> r.getChemicalInput().testType(gas));
-    }
 
     @Override
     public boolean tick(Level world) {
